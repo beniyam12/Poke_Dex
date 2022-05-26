@@ -9,8 +9,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import com.example.pokedexfinal.DataClasses.Sprites
-import com.example.pokedexfinal.DataClasses.myDataItem
+
+import com.example.pokedexfinal.DataClasses.*
 import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     }
     fun fetchdata() {
         val edittext = findViewById<EditText>(R.id.editTextTextPersonName)
-        var input = Integer.parseInt(edittext.text.toString())
+        val input = (edittext.text.toString())
         val imageView = findViewById<ImageView>(R.id.imageView)
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
@@ -51,17 +51,23 @@ class MainActivity : AppCompatActivity() {
                 call: Call <myDataItem?>,
                 response: Response<myDataItem?>
             ) {
+                val body = response.body()
+                var id_input = body?.id
+                val url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id_input.png"
+
+
+
+                Picasso.get().load(url).resize(500,500).into(imageView)
+                //imageView.load(url)
+
                 val responseBody = response.body()!!
-
-                val image = findViewById<ImageView>(R.id.imageView)
-
-                    Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(image)
 
 
                 val text_name = findViewById<TextView>(R.id.text_name)
                 text_name.text = responseBody.name
 
-
+                val text_id = findViewById<TextView>(R.id.text_id)
+                text_id.text = responseBody.id.toString()
                 val text_BaseStat = findViewById<TextView>(R.id.text_BaseStat)
                 text_BaseStat.text = responseBody.base_experience.toString()
 
@@ -84,52 +90,13 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        val retrofitData1 = retrofitBuilder.getgender("$input")
-        retrofitData1.enqueue(object : Callback<myDataItem?> {
-            override fun onResponse(call: Call<myDataItem?>, response: Response<myDataItem?>) {
-                val responseBody = response.body()!!
-                val text_gender = findViewById<TextView>(R.id.text_gender)
-                text_gender.text = responseBody.name
-
-            }
-
-            override fun onFailure(call: Call<myDataItem?>, t: Throwable) {
-                Log.d("MainActivity", "onFailure " + t.message)
-            }
-        })
-
-        val retrofitData2 = retrofitBuilder.get_egg_group("$input")
-        retrofitData2.enqueue(object : Callback<myDataItem?> {
-            override fun onResponse(call: Call<myDataItem?>, response: Response<myDataItem?>) {
-                val responseBody = response.body()!!
-                val text_egg_group = findViewById<TextView>(R.id.text_egg_group)
-                text_egg_group.text = responseBody.name
-            }
-
-            override fun onFailure(call: Call<myDataItem?>, t: Throwable) {
-                Log.d("MainActivity", "onFailure " + t.message)
-            }
-        })
-        val retrofitSprite = retrofitBuilder.getSpriteData("$input")
-        retrofitSprite.enqueue(object : Callback<Sprites?> {
-            override fun onResponse(call: Call<Sprites?>, response: Response<Sprites?>) {
-                //val imageview = findViewById<ImageView>(R.id.imageView)
-              //  val data = response.body()?.front_default
-               // Picasso.get().load(data).into(imageView)
-
-                val url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$input.png"
 
 
 
-                val imageView = findViewById<ImageView>(R.id.imageView)
-                Picasso.get().load(url).into(imageView)
-            }
 
-            override fun onFailure(call: Call<Sprites?>, t: Throwable) {
-                    val text = findViewById<TextView>(R.id.textView)
-                    text.text = "fail"
-            }
-        })
+
+
+
 
     }
 
